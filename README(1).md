@@ -168,4 +168,3 @@ Luego accede a Swagger:
 ✔ Mappers automáticos\
 ✔ CRUD completo con paginación\
 ✔ Datos cargados automáticamente\
-✔ Proyecto listo para entregar
