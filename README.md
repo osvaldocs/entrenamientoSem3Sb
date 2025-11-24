@@ -1,63 +1,40 @@
-HU3 – Catálogo de Eventos y Venues
+HU3 – Catálogo de Eventos y Venues  
+Arquitectura Hexagonal + JPA + Swagger + Paginación
 
-Arquitectura Hexagonal + Spring Boot 3 + Spring Data JPA + Swagger + Paginación
-
-Este proyecto implementa la Historia de Usuario HU3, donde se refactoriza la aplicación hacia una arquitectura hexagonal (Ports & Adapters) manteniendo equivalencia funcional con HU2.
-Incluye persistencia con Spring Data JPA (H2), validaciones, documentación Swagger, datos iniciales de prueba y paginación completa.
-
-🚀 Objetivo de la HU3
-
-Adoptar una arquitectura hexagonal que desacople completamente:
-
-Domain → Modelos del negocio.
-
-Application → Casos de uso.
-
-Infrastructure → Controladores REST, adaptadores JPA, configuración.
-
-La aplicación conserva el CRUD de HU2, pero ahora con persistencia real, puertos/servicios desacoplados y paginación en los listados.
-
-🔄 Paginación (Nueva funcionalidad HU3)
-
-El endpoint de listar Eventos soporta paginación usando Pageable de Spring Data.
-
-✔ Endpoint
-
-GET /events?page={num}&size={num}&sort={campo,asc|desc}
+Este proyecto implementa la Historia de Usuario HU3, refactorizando la aplicación hacia una arquitectura hexagonal (Ports & Adapters), manteniendo equivalencia funcional con HU2.  
+Incluye persistencia con H2, Swagger, paginación y datos pre-cargados para testear.
 
 
-✔ Ejemplos
+------------------------------------------------------------
+OBJETIVO
+------------------------------------------------------------
 
-Primera página con 5 eventos:
+Refactorizar el catálogo hacia arquitectura hexagonal, dividiendo el sistema en:
 
+- Domain → Modelos del negocio.
+- Application → Casos de uso (puertos de entrada).
+- Infrastructure → Controladores, adaptadores JPA, configuraciones.
+
+Se conserva el CRUD de HU2, pero ahora todo está desacoplado.
+
+
+------------------------------------------------------------
+PAGINACIÓN (Nueva funcionalidad HU3)
+------------------------------------------------------------
+
+El endpoint de listar eventos ahora soporta paginación.
+
+Ejemplos:
 GET /events?page=0&size=5
-
-
-Ordenados por fecha descendente:
-
+GET /events?page=1&size=10
 GET /events?page=0&size=5&sort=date,desc
 
-✔ Ejemplo de respuesta real
-
-{
-  "content": [
-    { "id": 1, "name": "Rock Festival" },
-    { "id": 2, "name": "Charity Gala" }
-  ],
-  "pageable": {
-    "pageNumber": 0,
-    "pageSize": 5
-  },
-  "totalPages": 11,
-  "totalElements": 52,
-  "last": false,
-  "first": true
-}
-
-Swagger detecta automáticamente page, size y sort, permitiendo probar la paginación desde la UI.
+Swagger detecta automáticamente los parámetros.
 
 
-📂 Estructura del Proyecto (Arquitectura Hexagonal)
+------------------------------------------------------------
+ESTRUCTURA DEL PROYECTO (HEXAGONAL)
+------------------------------------------------------------
 
 src/main/java/com.riwi.H3
 │
@@ -69,28 +46,14 @@ src/main/java/com.riwi.H3
 ├── application
 │   ├── port
 │   │   ├── in
-│   │   │   ├── EventUseCase.java
-│   │   │   └── VenueUseCase.java
 │   │   └── out
-│   │       ├── EventRepositoryPort.java
-│   │       └── VenueRepositoryPort.java
 │   └── service
-│       ├── EventServiceImpl.java
-│       └── VenueServiceImpl.java
 │
 ├── infrastructure
 │   ├── controller
-│   │   ├── EventController.java
-│   │   └── VenueController.java
 │   ├── adapter
-│   │   ├── EventJpaAdapter.java
-│   │   └── VenueJpaAdapter.java
 │   ├── entity
-│   │   ├── EventEntity.java
-│   │   └── VenueEntity.java
 │   ├── repository
-│   │   ├── EventJpaRepository.java
-│   │   └── VenueJpaRepository.java
 │   └── config
 │       ├── SwaggerConfig.java
 │       └── DataSeeder.java
@@ -99,64 +62,93 @@ src/main/java/com.riwi.H3
     ├── application.properties
     └── data.sql (opcional)
 
-🗄️ Base de Datos – H2
 
-Configuración típica:
+------------------------------------------------------------
+BASE DE DATOS
+------------------------------------------------------------
+
+Se usa H2 memoria.
 
 spring.datasource.url=jdbc:h2:mem:testdb
 spring.jpa.hibernate.ddl-auto=update
 spring.h2.console.enabled=true
 
 Consola H2:
-
 http://localhost:8080/h2-console
 
 
-🌱 Datos de prueba (Seed Data)
+------------------------------------------------------------
+DATOS PRECARGADOS (DataSeeder)
+------------------------------------------------------------
 
-Se cargan automáticamente usando CommandLineRunner:
-
-2 Venues
-
-2 Eventos iniciales
-
-+50 eventos generados para probar paginación
-
-Esto permite desarrollar y testear sin necesidad de cargar nada manualmente.
+Incluye:
+- 2 venues
+- 2 eventos iniciales
+- 50 eventos extra para probar paginación
 
 
-📘 Documentación Swagger / OpenAPI
+------------------------------------------------------------
+DEPENDENCIAS PRINCIPALES
+------------------------------------------------------------
 
-Disponible en:
+- Spring Web
+- Spring Data JPA
+- H2 Database
+- Springdoc OpenAPI
+- Lombok (opcional)
 
+Swagger:
 http://localhost:8080/swagger-ui/index.html
 
-Controladores documentados con:
 
-@Tag
+------------------------------------------------------------
+ENDPOINTS
+------------------------------------------------------------
 
-@Operation
+EVENTS:
+POST /events        → Crear
+GET /events         → Listar con paginación
+GET /events/{id}    → Buscar por ID
+PUT /events/{id}    → Actualizar
+DELETE /events/{id} → Eliminar
 
-@ApiResponse
+VENUES:
+POST /venues        → Crear
+GET /venues         → Listar
+GET /venues/{id}    → Buscar por ID
+PUT /venues/{id}    → Actualizar
+DELETE /venues/{id} → Eliminar
 
-📝 Endpoints Principales
-Events
-Método	Ruta	Descripción
-POST	/events	Crear evento
-GET	/events	Listar (con paginación)
-GET	/events/{id}	Obtener por ID
-PUT	/events/{id}	Actualizar
-DELETE	/events/{id}	Eliminar
+
+------------------------------------------------------------
+CRITERIOS DE ACEPTACIÓN HU3
+------------------------------------------------------------
+
+- Arquitectura Hexagonal implementada
+- CRUD completo (Events y Venues)
+- Servicios desacoplados por interfaces
+- Adaptadores JPA funcionando
+- Paginación funcional
+- Swagger operativo
+- H2 funcionando
+- Código limpio y modular
+
+
+------------------------------------------------------------
+EJECUCIÓN
+------------------------------------------------------------
 
 mvn spring-boot:run
 
+Swagger UI:
+http://localhost:8080/swagger-ui/index.html
+
+H2 Console:
+http://localhost:8080/h2-console
 
 
-
-    Swagger: http://localhost:8080/swagger-ui/index.html
-
-H2 Console: http://localhost:8080/h2-console
-👨‍💻 Autor
+------------------------------------------------------------
+AUTOR
+------------------------------------------------------------
 
 Proyecto desarrollado como parte del entrenamiento Riwi — HU3: Arquitectura Hexagonal.
-
